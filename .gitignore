@@ -1,0 +1,42 @@
+# dependencies
+node_modules
+
+# build outputs
+out
+dist
+*.tgz
+
+# nuxt
+.nuxt
+.output
+
+# turbo
+.turbo
+
+# code coverage
+coverage
+*.lcov
+
+# logs
+logs
+*.log
+report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
+
+# dotenv
+.env
+.env.development.local
+.env.test.local
+.env.production.local
+.env.local
+
+# caches
+.eslintcache
+.cache
+*.tsbuildinfo
+
+# editors
+.idea
+.vscode
+
+# OS
+.DS_Store

@@ -1,0 +1,90 @@
+import { HTTPException } from "hono/http-exception";
+import { StatusCodes } from "http-status-toolkit";
+
+import type { CreateLeaseInput } from "@/modules/leases/leases.schema";
+import type { Unit, UpdateUnitInput } from "@/modules/units/units.schema";
+
+import { leasesRepository } from "@/modules/leases/leases.repository";
+import { unitsRepository } from "@/modules/units/units.repository";
+
+export const unitsService = {
+  get: async (id: number, ownerId: number): Promise<Unit> => {
+    const unit = await unitsRepository.findByIdAndOwnerId(id, ownerId);
+    if (!unit) {
+      throw new HTTPException(StatusCodes.NOT_FOUND, {
+        message: "Unit not found",
+      });
+    }
+    return unit;
+  },
+  list: async (ownerId: number) => {
+    return await unitsRepository.findManyByOwnerId(ownerId);
+  },
+  update: async (id: number, ownerId: number, input: UpdateUnitInput) => {
+    const validUnit = await unitsRepository.findByIdAndOwnerId(id, ownerId);
+    if (!validUnit) {
+      throw new HTTPException(StatusCodes.NOT_FOUND, {
+        message: "Unit not found",
+      });
+    }
+    const updated = await unitsRepository.update(id, input);
+
+    if (!updated) {
+      throw new HTTPException(StatusCodes.INTERNAL_SERVER_ERROR, {
+        message: "Failed to update unit",
+      });
+    }
+
+    return updated;
+  },
+  listLeases: async (unitId: number, ownerId: number) => {
+    const validUnit = await unitsRepository.findByIdAndOwnerId(unitId, ownerId);
+
+    if (!validUnit) {
+      throw new HTTPException(StatusCodes.NOT_FOUND, {
+        message: "Unit not found",
+      });
+    }
+
+    const leases = await leasesRepository.findManyByOwnerId(ownerId);
+
+    if (!leases) {
+      throw new HTTPException(StatusCodes.INTERNAL_SERVER_ERROR, {
+        message: "Failed to find leases",
+      });
+    }
+
+    return leases;
+  },
+  createLease: async (
+    unitId: number,
+    ownerId: number,
+    input: CreateLeaseInput,
+  ) => {
+    const validUnit = await unitsRepository.findByIdAndOwnerId(unitId, ownerId);
+
+    if (!validUnit) {
+      throw new HTTPException(StatusCodes.NOT_FOUND, {
+        message: "Unit not found",
+      });
+    }
+
+    const isAvailable = unitsRepository.isAvailable(unitId);
+
+    if (!isAvailable) {
+      throw new HTTPException(StatusCodes.BAD_REQUEST, {
+        message: "Unit is not available",
+      });
+    }
+
+    const created = await leasesRepository.create(unitId, input);
+
+    if (!created) {
+      throw new HTTPException(StatusCodes.INTERNAL_SERVER_ERROR, {
+        message: "Failed to create lease",
+      });
+    }
+
+    return created;
+  },
+};

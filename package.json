@@ -1,0 +1,31 @@
+{
+    "name": "rms",
+    "module": "index.ts",
+    "type": "module",
+    "private": true,
+    "workspaces": [
+        "apps/*"
+    ],
+    "scripts": {
+        "dev": "turbo dev",
+        "build": "turbo build",
+        "test": "turbo test",
+        "typecheck": "turbo typecheck",
+        "lint": "turbo lint",
+        "format": "turbo format",
+        "clean": "rm -rf .turbo node_modules apps/*/node_modules apps/*/dist apps/client/.nuxt apps/client/.output && bun install"
+    },
+    "packageManager": "bun@1.3.6",
+    "devDependencies": {
+        "@types/bun": "latest",
+        "oxfmt": "^0.31.0",
+        "oxlint": "^1.49.0",
+        "oxlint-tsgolint": "^0.13.0"
+    },
+    "peerDependencies": {
+        "typescript": "^5.9.3"
+    },
+    "dependencies": {
+        "turbo": "^2.8.10"
+    }
+}
